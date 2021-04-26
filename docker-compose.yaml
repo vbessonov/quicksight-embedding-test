@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  dashboard:
+    build: ./dashboard
+    image: dashboard
+    ports:
+      - 443:443
+    volumes:
+      - type: bind
+        source: ./dashboard/config.cfg
+        target: /etc/config.cfg
+    environment:
+      - APPLICATION_SETTINGS_FILE=/etc/config.cfg

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QuickSight Dashboard Embedding Test</title>
+    <script src="https://unpkg.com/amazon-quicksight-embedding-sdk@1.0.13/dist/quicksight-embedding-js-sdk.min.js"></script>
+    <script>
+        function onDashboardLoad(payload) {
+            console.log("Do something when the dashboard is fully loaded.");
+        }
+
+        function onError(payload) {
+            console.log("Do something when the dashboard fails loading");
+        }
+
+        function embedDashboard(dashboardContainer) {
+            fetch("{{ url_for("api.dashboard_url") }}", {
+                method: 'GET', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log(data);
+                    const url = JSON.parse(data["body"])["EmbedUrl"];
+                    const containerDiv = document.getElementById(dashboardContainer);
+                    const options = {
+                        url: url,
+                        container: containerDiv,
+                        parameters: {
+                            country: 'United States'
+                        },
+                        scrolling: "no",
+                        height: "700px",
+                        width: "1000px"
+                    };
+                    const dashboard = QuickSightEmbedding.embedDashboard(options);
+                    dashboard.on('error', onError);
+                    dashboard.on('load', onDashboardLoad);
+                });
+        }
+    </script>
+</head>
+<body onload="embedDashboard('dashboard-container')">
+    <h1>Below is the embedded QuickSight dashboard</h1>
+    <div id="dashboard-container"></div>
+</body>
+</html>
